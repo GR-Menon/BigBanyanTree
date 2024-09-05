@@ -24,7 +24,7 @@ shuffled_file=$(mktemp)
 shuf "$input_file" > "$shuffled_file"
 
 # Number of lines to sample per file
-lines_per_file=60
+lines_per_file=10
 
 # Total number of output files
 total_files=$(($num_warcs / $lines_per_file))

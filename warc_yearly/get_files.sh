@@ -17,7 +17,7 @@ mkdir -p "$output_dir"
 
 # Download the sampled files to the output directory ("https://data.commoncrawl.org/$url")
 while IFS= read -r url; do
-    wget -P "$output_dir" "https://data.commoncrawl.org/$url"
+    wget -P "$output_dir" "https://data.commoncrawl.org/$url" &>/dev/null
 done < "$input_txt"
 
 # Extract downloaded .gz files one by one

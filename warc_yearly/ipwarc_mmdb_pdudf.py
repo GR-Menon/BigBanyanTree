@@ -77,7 +77,7 @@ warciphost_df = spark.createDataFrame(output, schema=output_schema)
 # broadcast the `SerializableReader` object from which the reader is created lazily inside the UDF.
 # have a look at `get_ip_info`.
 import ip_utils
-reader_broadcast = spark.sparkContext.broadcast(ip_utils.SerializableReader("/opt/workspace/datasets/maxmind/GeoLite2-City_20240820/GeoLite2-City.mmdb", "/opt/workspace/warc_spark/mmdb_errors.txt"))
+reader_broadcast = spark.sparkContext.broadcast(ip_utils.SerializableReader("/opt/workspace/datasets/maxmind/GeoLite2-City_20240903/GeoLite2-City.mmdb"))
 
 ip_info_schema = StructType([
     StructField("postal_code", StringType(), True),
@@ -134,8 +134,6 @@ result_df = warciphost_df.withColumn("ip_info", get_ip_info("ip"))
 final_df = result_df.select("ip", "host", "server", "ip_info.*").dropna("all")
 final_df = final_df.dropDuplicates(["ip"]).repartition(1)
 
-final_df.write.mode("append").csv(args.output_dir, header=True)
+final_df.write.option("delimiter", "\t").mode("append").csv(args.output_dir, header=True)
 
-# close errfile to ensure data is written to from buffers
-reader_broadcast.value.close()
 reader_broadcast.unpersist()

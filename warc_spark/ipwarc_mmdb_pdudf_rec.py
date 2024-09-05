@@ -136,6 +136,5 @@ final_df = final_df.dropDuplicates(["ip"]).repartition(1)
 
 final_df.write.mode("append").csv(args.output_dir, header=True)
 
-# close errfile to ensure data is written to from buffers
 reader_broadcast.value.close()
 reader_broadcast.unpersist()

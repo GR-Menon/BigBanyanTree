@@ -1,0 +1,12 @@
+https://data.commoncrawl.org/crawl-data/CC-MAIN-2013-48/warc.paths.gz
+https://data.commoncrawl.org/crawl-data/CC-MAIN-2014-52/warc.paths.gz
+https://data.commoncrawl.org/crawl-data/CC-MAIN-2015-48/warc.paths.gz
+https://data.commoncrawl.org/crawl-data/CC-MAIN-2016-50/warc.paths.gz
+https://data.commoncrawl.org/crawl-data/CC-MAIN-2017-51/warc.paths.gz
+https://data.commoncrawl.org/crawl-data/CC-MAIN-2018-51/warc.paths.gz
+https://data.commoncrawl.org/crawl-data/CC-MAIN-2019-51/warc.paths.gz
+https://data.commoncrawl.org/crawl-data/CC-MAIN-2020-50/warc.paths.gz
+https://data.commoncrawl.org/crawl-data/CC-MAIN-2021-49/warc.paths.gz
+https://data.commoncrawl.org/crawl-data/CC-MAIN-2022-49/warc.paths.gz
+https://data.commoncrawl.org/crawl-data/CC-MAIN-2023-50/warc.paths.gz
+https://data.commoncrawl.org/crawl-data/CC-MAIN-2024-33/warc.paths.gz
