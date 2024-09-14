@@ -13,6 +13,9 @@ mkdir -p "$output_dir"
 # Number of warc files to process in the input_file
 num_warcs=$3
 
+# WARC year
+warc_year=$4
+
 # Check if the input file exists
 if [ ! -f "$input_file" ]; then
   echo "Input file not found!"
@@ -24,7 +27,7 @@ shuffled_file=$(mktemp)
 shuf "$input_file" > "$shuffled_file"
 
 # Number of lines to sample per file
-lines_per_file=10
+lines_per_file=20
 
 # Total number of output files
 total_files=$(($num_warcs / $lines_per_file))
@@ -32,7 +35,7 @@ total_files=$(($num_warcs / $lines_per_file))
 # Create 100 files with random samples of 10 lines each
 counter=1
 for i in $(seq 1 $total_files); do
-  output_file="$output_dir/warc_part_$(printf "%03d" "$counter").txt"
+  output_file="$output_dir/warc_part_$(printf "%03d" "$counter")_$warc_year.txt"
   head -n $lines_per_file "$shuffled_file" > "$output_file"
   # Remove the selected lines from the shuffled file to avoid duplication
   sed -i "1,${lines_per_file}d" "$shuffled_file"

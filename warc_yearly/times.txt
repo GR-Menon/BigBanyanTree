@@ -1,0 +1,2 @@
+[warc_2024.paths]: 34922.48 seconds
+[warc_2023.paths]: 60430.16 seconds

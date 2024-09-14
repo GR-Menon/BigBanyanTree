@@ -2,6 +2,12 @@
 **/.ipynb_checkpoints/
 **/__pycache__/
 /.Trash-0/
-/warc_spark/iphost_out/
-/warc_spark/script_ext_out/
+/warc_yearly/ipmaxmind_out/
+/warc_yearly/ipmaxmind_out_2023/
+/warc_yearly/ipmaxmind_out_2024/
+/warc_yearly/script_extraction_out/
+/warc_yearly/script_extraction_out_2023/
+/warc_yearly/script_extraction_out_2024/
 /.ssh/
+
+**.db

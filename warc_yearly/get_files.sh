@@ -15,25 +15,40 @@ echo "Downloading files from file: $input_txt ..."
 # Create the output directory if it doesn't exist
 mkdir -p "$output_dir"
 
-# Download the sampled files to the output directory ("https://data.commoncrawl.org/$url")
-while IFS= read -r url; do
-    wget -P "$output_dir" "https://data.commoncrawl.org/$url" &>/dev/null
-done < "$input_txt"
+# Total number of files to download
+total_files=$(wc -l < "$input_txt")
+echo "Total files to download: $total_files"
 
-# Extract downloaded .gz files one by one
-for file in "$output_dir"/*.gz; do
-    if [ -f "$file" ]; then
-        echo "Processing $file ..."
-        
-        # Print file size before extraction
-        echo "File size before extraction:"
-        du -h "$file"
-        
-        # Move the uncompressed file to the output directory (in case extraction creates it in the current directory)
-        # mv "$uncompressed_file" "$output_dir/"
-    else
-        echo "No .gz files found to process."
-    fi
-done
+# Download 10 files in parallel using xargs and wget
+cat "$input_txt" | xargs -P 10 -I {} sh -c '
+    echo "Downloading https://data.commoncrawl.org/{} ..."
+    wget -q -P "'"$output_dir"'" "https://data.commoncrawl.org/{}"
+'
 
-ls $output_dir/*.gz | xargs -P 10 -I {} gzip -d {}
+# Check for .gz files in the directory
+gz_files=$(ls "$output_dir"/*.gz 2>/dev/null)
+if [ -z "$gz_files" ]; then
+    echo "No .gz files found to process."
+    exit 1
+fi
+
+# Total number of files downloaded
+downloaded_files=$(ls "$output_dir"/*.gz | wc -l)
+echo "Total files downloaded: $downloaded_files"
+
+# Extract .gz files in parallel, 10 at a time
+echo "Processing downloaded .gz files..."
+
+# Process each .gz file in parallel (up to 10 files at once)
+ls "$output_dir"/*.gz | xargs -P 10 -I {} sh -c '
+    echo "Processing {} ..."
+    
+    # Print file size before extraction
+    echo "File size before extraction:"
+    du -h "{}"
+    
+    # Extract file
+    gzip -d "{}"
+'
+
+echo "Download and extraction complete."
