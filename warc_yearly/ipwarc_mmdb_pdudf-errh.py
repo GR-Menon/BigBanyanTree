@@ -23,6 +23,7 @@ spark = SparkSession.builder \
     .master("spark://spark-master:7077") \
     .config("spark.eventLog.enabled", "true") \
     .config("spark.eventLog.dir", "file:///opt/spark/spark-events/") \
+    .config("spark.sql.execution.arrow.pyspark.enabled", "true") \
     .config("spark.executor.memory", "4g") \
     .config("spark.executor.cores", 1) \
     .config("spark.dynamicAllocation.enabled", "true") \
@@ -40,6 +41,7 @@ spark.sparkContext.addPyFile("./ip_utils.py")
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_file", help="path to a text file that has warc paths")
 parser.add_argument("--output_dir", help="output path to save processed results")
+parser.add_argument("--year", help="CC dump year")
 args = parser.parse_args()
 
 def process_record(record):
@@ -77,6 +79,7 @@ import ip_utils
 reader_broadcast = spark.sparkContext.broadcast(ip_utils.SerializableReader("/opt/workspace/datasets/maxmind/GeoLite2-City_20240903/GeoLite2-City.mmdb"))
 
 ip_info_schema = StructType([
+    StructField("year", StringType()),
     StructField("postal_code", StringType(), True),
     StructField("latitude", FloatType(), True),
     StructField("longitude", FloatType(), True),
@@ -106,6 +109,7 @@ def get_ip_info(ips: pd.Series) -> pd.DataFrame:
         try:
             response = reader.city(ip)
             result.append((
+                args.year,
                 response.postal.code if response else None,
                 response.location.latitude if response else None,
                 response.location.longitude if response else None,
@@ -121,7 +125,7 @@ def get_ip_info(ips: pd.Series) -> pd.DataFrame:
                 response.location.time_zone if response else None,
             ))
         except Exception as e:
-            result.append((None,) * len(ip_info_schema))
+            result.append( (args.year, ) + (None,) * (len(ip_info_schema) - 1) )
 
     return pd.DataFrame(result, columns=ip_info_schema.names)
 

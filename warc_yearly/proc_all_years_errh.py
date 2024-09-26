@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import os
 import time
 import shutil
@@ -11,28 +5,11 @@ import pathlib
 import subprocess
 from urllib.request import urlretrieve
 
-
-# In[2]:
-
-
-os.makedirs("warc_paths", exist_ok=True)
-with open("yearly_crawls.txt", 'r') as f:
-    for cc_crawl in f:
-        year = cc_crawl.split('-')[-2]
-        file_name = f"./warc_paths/warc_{year}.paths.gz"
-        urlretrieve(cc_crawl, file_name)
-        os.system(f"gzip -d {file_name}")
-
-
-# In[3]:
-
+wp = "warc_2019.paths"
+year = "2019"
 
 os.makedirs("./unsuccessful/", exist_ok=True)
 os.makedirs("./success/", exist_ok=True)
-
-
-# In[4]:
-
 
 def num_warcs_to_proc(wp_file: str) -> int:
     """Returns the number of lines in the warc.paths file."""
@@ -41,18 +18,10 @@ def num_warcs_to_proc(wp_file: str) -> int:
             pass
     return count + 1
 
-
-# In[5]:
-
-
 def gen_file_splits(wp_file: str):
     """Given a warc.paths file, generates `.txt` files having specified number of WARC filepaths"""
-    warc_sample_len = num_warcs_to_proc(wp_file) // 100
-    os.system(f"./file_split.sh warc_paths/{wp_file} warc_splits/ {warc_sample_len} {wp_file.split('_')[-1].split('.')[0]}")
-
-
-# In[6]:
-
+    warc_sample_len = num_warcs_to_proc(wp_file) // 100 # not used. 900 is used directly
+    os.system(f"./file_split.sh warc_paths/{wp_file} warc_splits/ 900 {wp_file.split('_')[-1].split('.')[0]}")
 
 def to_paths(input_txt):
     """Converts the WARC URLs to their corresponding paths on the device."""
@@ -66,15 +35,11 @@ def to_paths(input_txt):
         for l in updated:
             f.write(l + "\n")
 
-
-# In[7]:
-
-
 def submit_job(input_txt: str):
     """Submits two spark jobs and waits for them to finish. If both jobs succeed, then the `input_txt` file is moved to success/ dir."""
     os.makedirs("tmp/", exist_ok=True)
-    cmd1 = ["spark-submit", "ipwarc_mmdb_pdudf-errh.py", "--input_file", f"warc_splits/{input_txt}", "--output_dir", "tmp/ipmaxmind_out"]
-    cmd2 = ["spark-submit", "script_extraction-errh.py", "--input_file", f"warc_splits/{input_txt}", "--output_dir", "tmp/script_extraction_out"]
+    cmd1 = ["spark-submit", "ipwarc_mmdb_pdudf-errh.py", "--input_file", f"warc_splits/{input_txt}", "--output_dir", "tmp/ipmaxmind_out", "--year", year]
+    cmd2 = ["spark-submit", "script_extraction-errh.py", "--input_file", f"warc_splits/{input_txt}", "--output_dir", "tmp/script_extraction_out", "--year", year]
 
     status_file = "job_status.txt"
     if os.path.exists(status_file):
@@ -96,13 +61,13 @@ def submit_job(input_txt: str):
         for filename in os.listdir("tmp/ipmaxmind_out/"):
             if filename == ".ipynb_checkpoints": continue
             src_file = os.path.join("tmp/ipmaxmind_out/", filename)
-            dst_file = os.path.join("ipmaxmind_out/", filename)
+            dst_file = os.path.join(f"ipmaxmind_out_{year}/", filename)
             shutil.move(src_file, dst_file)
 
         for filename in os.listdir("tmp/script_extraction_out/"):
             if filename == ".ipynb_checkpoints": continue
             src_file = os.path.join("tmp/script_extraction_out/", filename)
-            dst_file = os.path.join("script_extraction_out/", filename)
+            dst_file = os.path.join(f"script_extraction_out_{year}/", filename)
             shutil.move(src_file, dst_file)
             
         print("Both jobs succeeded. Outputs moved to final directories.")
@@ -117,10 +82,6 @@ def submit_job(input_txt: str):
         shutil.rmtree('tmp/ipmaxmind_out', ignore_errors=True)
         shutil.rmtree('tmp/script_extraction_out', ignore_errors=True)
         print("One or more jobs failed. Outputs discarded.")
-
-
-# In[9]:
-
 
 def process_wp(wp_file: str):
     """Process a warc.paths file by generating splits, and submitting each of the split `.txt` file to spark."""
@@ -137,7 +98,7 @@ def process_wp(wp_file: str):
     for input_txt in sorted(os.listdir("warc_splits")):
         if input_txt == ".ipynb_checkpoints": continue
         os.makedirs(data_dir)
-        os.system(f"./get_files.sh warc_splits/{input_txt} {data_dir}")
+        os.system(f"./get_files_errh.sh warc_splits/{input_txt} {data_dir}")
         to_paths(f"warc_splits/{input_txt}")
         submit_job(input_txt)
         shutil.rmtree(data_dir)
@@ -153,26 +114,7 @@ def process_wp(wp_file: str):
     with open("times.txt", 'a') as f:
         f.write(f"[{wp_file}]: {total_time:.2f} seconds\n")
 
+os.makedirs(f"ipmaxmind_out_{year}/", exist_ok=True)
+os.makedirs(f"script_extraction_out_{year}/", exist_ok=True)
 
-# In[16]:
-
-
-# for wp in sorted(os.listdir("warc_paths")):
-#     # remove exist_ok arg in the actual run
-#     process_wp(wp)
-#     # break
-
-
-os.makedirs("ipmaxmind_out/", exist_ok=True)
-os.makedirs("script_extraction_out/", exist_ok=True)
-
-wp = "warc_2023.paths"
 process_wp(wp)
-
-
-
-# In[ ]:
-
-
-
-

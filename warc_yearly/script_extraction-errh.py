@@ -17,6 +17,7 @@ spark = SparkSession.builder \
     .master("spark://spark-master:7077") \
     .config("spark.eventLog.enabled", "true") \
     .config("spark.eventLog.dir", "file:///opt/spark/spark-events/") \
+    .config("spark.sql.execution.arrow.pyspark.enabled", "true") \
     .config("spark.executor.memory", "4g") \
     .config("spark.executor.cores", 1) \
     .config("spark.dynamicAllocation.enabled", "true") \
@@ -31,6 +32,7 @@ spark = SparkSession.builder \
 parser = argparse.ArgumentParser()
 parser.add_argument("--input_file", help="path to a text file that has WARC paths")
 parser.add_argument("--output_dir", help="output path to save processed results")
+parser.add_argument("--year", help="CC dump year")
 args = parser.parse_args()
 
 ################# Broadcast Variables ######################
@@ -39,11 +41,12 @@ broadcast_email_regex = spark.sparkContext.broadcast(email_regex)
 
 ################# DataFrame Schema ######################
 output_schema = StructType([
+    StructField("year", StringType()),
     StructField("ip", StringType(), True),
     StructField("host", StringType(), True),
     StructField("server", StringType(), True),
     StructField("emails", ArrayType(StringType()), True),
-    StructField("script_src_attrs", ArrayType(StringType()), True),
+    StructField("script_src_attrs", ArrayType(StringType()), True)
 ])
 
 ################# WARC Processing Functions ######################
@@ -78,7 +81,7 @@ def process_record(record: ArcWarcRecord):
             and not script.attributes.get('src').startswith('data:')
         ]
 
-        return (ip, url, server, emails, src_attrs)
+        return (args.year, ip, url, server, emails, src_attrs)
     return None
 
 def process_warc(filepath):

@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # usage: file_split.sh <input_file> <output_dir> <num_warcs_to_proc>
@@ -32,7 +31,7 @@ lines_per_file=20
 # Total number of output files
 total_files=$(($num_warcs / $lines_per_file))
 
-# Create 100 files with random samples of 10 lines each
+# Create `total_files` number of files with random samples of `lines_per_file` lines each
 counter=1
 for i in $(seq 1 $total_files); do
   output_file="$output_dir/warc_part_$(printf "%03d" "$counter")_$warc_year.txt"
