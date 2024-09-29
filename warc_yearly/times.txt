@@ -4,3 +4,5 @@
 [warc_2021.paths]: 52996.45 seconds
 [warc_2020.paths]: 43577.53 seconds
 [warc_2019.paths]: 21899.41 seconds
+[warc_2019.paths]: 48196.27 seconds
+[warc_2018.paths]: 49652.02 seconds

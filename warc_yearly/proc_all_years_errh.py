@@ -5,8 +5,8 @@ import pathlib
 import subprocess
 from urllib.request import urlretrieve
 
-wp = "warc_2019.paths"
-year = "2019"
+wp = "warc_2018.paths"
+year = "2018"
 
 os.makedirs("./unsuccessful/", exist_ok=True)
 os.makedirs("./success/", exist_ok=True)

@@ -13,6 +13,7 @@
 /year_test_dir/
 /spark_qa/jslibs_co_occ_2023/
 /.ssh/
-
+/yearly_retry/
+/hfdata/
 **.db
 
