@@ -1,6 +1,0 @@
-Note: only deploy time configurations are listed here. i.e., these configurations can only be set during deploy time and may not be affected when setting programmatically when setting through SparkConf during runtime. Refer https://spark.apache.org/docs/latest/configuration.html#dynamically-loading-spark-properties to know more.
-
-
-SPARK_WORKER_CORES = 2
-SPARK_WORKER_MEMORY = 4g
-SPARK_DRIVER_MEMORY = 1g
