@@ -1,6 +1,8 @@
 # BigBanyanTree
 
-<img src="assets/bbt.jpg" width="50%">    
+<p align="center">
+  <img src="assets/bbt.jpg" width="50%">
+</p>      
 <br>
 BigBanyanTree is an initiative to empower engineering colleges to set up their data engineering clusters and drive
 interest in data processing and analysis using tools such as Apache Spark.
